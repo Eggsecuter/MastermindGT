@@ -1,0 +1,116 @@
+* {
+    display: block;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: calibri;
+    line-height: 1;
+}
+
+head, script, style, [hidden] {
+    display: none;
+}
+
+body{
+    background: rgb(60, 60, 60);
+
+    --tile-size: calc((100vh - 85px) / var(--tiles-y));
+    /* --tile-size: 32px; */
+}
+
+gametitle{
+    margin: 10px 20px;
+    font-size: 35px;
+    color: rgb(150, 150, 150);
+}
+
+info{
+    margin: 10px 20px;
+    font-size: 20px;
+    color: rgb(150, 150, 150);
+}
+
+board {
+    position: relative;
+}
+
+board row {
+    display: flex;
+}
+
+board row tile {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    border: 1px solid black;
+    flex-shrink: 0;
+}
+
+key{
+    width: var(--tile-size);
+    height: var(--tile-size);
+}
+
+tile[wall]{
+    background: black;
+}
+
+tile[start] {
+    background: orange;
+}
+
+tile[end] {
+    background: greenyellow;
+}
+
+tile[door] {
+    background: rgba(0, 0, 0, .2);
+    transition: 1s;
+}
+
+tile[door][locked] {
+    background: brown;
+}
+
+player{
+    position: absolute;
+    left: calc(var(--x) * var(--tile-size));
+    top: calc(var(--y) * var(--tile-size));
+    width: var(--tile-size);
+    height: var(--tile-size);
+    transition: 0.2s;
+}
+
+player[index="0"] {
+    --sprite-x: 15;
+    --sprite-y: 15;
+}
+
+player[index="1"] {
+    --sprite-x: 14;
+    --sprite-y: 15;
+}
+
+tile{
+    --sprite-x: 4;
+    --sprite-y: 7;
+}
+
+tile[deadly]{
+    --sprite-x: 4;
+    --sprite-y: 0;
+}
+
+key{
+    --sprite-x: 11;
+    --sprite-y: 13;
+}
+
+/* sprites */
+player,
+key,
+tile {
+    background: url('assets/sprite-map.png') no-repeat;
+    background-size: calc(16 * var(--tile-size));
+    image-rendering: pixelated;
+    background-position: calc(var(--tile-size) * -1 * var(--sprite-x)) calc(var(--tile-size) * -1 * var(--sprite-y));
+}
