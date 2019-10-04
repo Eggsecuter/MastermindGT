@@ -42,6 +42,30 @@ var Board = /** @class */ (function () {
     };
     return Board;
 }());
+var Card = /** @class */ (function () {
+    function Card(parent, player) {
+        this.player = player;
+        this.element = document.createElement("card");
+        parent.appendChild(this.element);
+        this.title = document.createElement("card-title");
+        this.element.appendChild(this.title);
+        this.content = document.createElement("card-content");
+        this.element.appendChild(this.content);
+    }
+    Card.prototype.render = function () {
+        this.title.textContent = "Player: " + this.player.keyUp;
+        this.element.appendChild(this.title);
+        this.content.textContent = "Keys: " + this.player.collectedItems.filter(function (i) { return i instanceof KeyItem; }).length;
+        this.element.appendChild(this.content);
+        if (this.player.reachedEnd) {
+            this.element.setAttribute("success", "");
+        }
+        else {
+            this.element.removeAttribute("success");
+        }
+    };
+    return Card;
+}());
 function load(index) {
     game.loadLevel(game.levels[index - 1]);
     return "Current level: " + (game.levels.indexOf(game.currentLevel) + 1);
@@ -62,65 +86,104 @@ var game;
 var Game = /** @class */ (function () {
     function Game(multiplayer) {
         this.multiplayer = multiplayer;
-        this.levels = [
-            new Level("PBC Startup", 3, [
-                new StartTile(0, 0),
-                new EndTile(2, 0)
-            ], []),
-            new Level("bands bands bands", 5, [
-                new StartTile(0, 1),
-                new EndTile(2, 0),
-                new DeadlyTile(0, 0),
-                new DeadlyTile(1, 0),
-                new DeadlyTile(1, 1)
-            ], []),
-            new Level("Racks in da fridge", 5, [
-                new StartTile(1, 0),
-                new EndTile(4, 4),
-                new DoorTile(2, 1),
-                new DoorTile(3, 2),
-                new WallTile(2, 0),
-                new WallTile(2, 2),
-                new WallTile(4, 2),
-                new WallTile(2, 3),
-                new WallTile(1, 3),
-                new WallTile(1, 4)
-            ], [
-                new KeyItem(4, 0),
-                new KeyItem(0, 4)
-            ]),
-            new Level("Adran Habler", 16, [
-                new StartTile(0, 0),
-                new EndTile(1, 1),
-                new DeadlyTile(1, 0)
-            ], [])
-        ];
+        if (multiplayer) {
+            this.levels = [
+                new Level("Multikulti Sinepius", 3, [
+                    new StartTile(0, 2),
+                    new StartTile(2, 2),
+                    new EndTile(0, 0),
+                    new EndTile(2, 0),
+                    new WallTile(1, 0),
+                    new WallTile(1, 1),
+                    new WallTile(1, 2)
+                ], []),
+                new Level("Multasdfasdfikupius", 4, [
+                    new StartTile(3, 3),
+                    new StartTile(0, 0),
+                    new EndTile(1, 0),
+                    new EndTile(2, 2)
+                ], []),
+                new Level("ES for advanced people", 4, [
+                    new StartTile(3, 3),
+                    new StartTile(0, 0),
+                    new EndTile(1, 0),
+                    new EndTile(2, 2)
+                ], [])
+            ];
+        }
+        else {
+            this.levels = [
+                new Level("PBC Startup", 3, [
+                    new StartTile(0, 0),
+                    new EndTile(2, 0)
+                ], []),
+                new Level("bands bands bands", 5, [
+                    new StartTile(0, 1),
+                    new EndTile(2, 0),
+                    new DeadlyTile(0, 0),
+                    new DeadlyTile(1, 0),
+                    new DeadlyTile(1, 1),
+                    new DeadlyTile(3, 3)
+                ], []),
+                new Level("Racks in da fridge", 5, [
+                    new StartTile(1, 0),
+                    new EndTile(4, 4),
+                    new DoorTile(2, 1),
+                    new DoorTile(3, 2),
+                    new WallTile(2, 0),
+                    new WallTile(2, 2),
+                    new WallTile(4, 2),
+                    new WallTile(2, 3),
+                    new WallTile(1, 3),
+                    new WallTile(1, 4)
+                ], [
+                    new KeyItem(4, 0),
+                    new KeyItem(0, 4)
+                ]),
+                new Level("Adran Habler", 16, [
+                    new StartTile(0, 0),
+                    new EndTile(1, 1),
+                    new DeadlyTile(1, 0)
+                ], [])
+            ];
+        }
         this.currentLevel = this.levels[0];
     }
     Game.prototype.start = function () {
         var _this = this;
-        this.infobar = new InfoBar();
-        this.board = new Board();
-        var start = this.currentLevel.tiles.find(function (item) { return item instanceof StartTile; });
+        document.body.querySelector("game").textContent = "";
+        this.players = [];
+        var starts = this.currentLevel.tiles.filter(function (item) { return item instanceof StartTile; });
         if (this.multiplayer) {
-            this.players = [
-                new Player(start.x, start.y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                new Player(start.x, start.y, "w", "a", "s", "d")
-            ];
+            if (starts.length > 1) {
+                this.players = [
+                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
+                    new Player(starts[1].x, starts[1].y, "w", "a", "s", "d")
+                ];
+            }
+            else if (starts.length == 1) {
+                this.players = [
+                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
+                    new Player(starts[0].x, starts[0].y, "w", "a", "s", "d")
+                ];
+            }
         }
         else {
-            this.players = [
-                new Player(start.x, start.y, "arrowup", "arrowleft", "arrowdown", "arrowright")
-            ];
+            if (starts.length == 1) {
+                this.players = [
+                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright")
+                ];
+            }
         }
+        this.board = new Board();
         this.board.render();
+        this.infobar = new InfoBar();
         this.infobar.render();
         for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
             var player = _a[_i];
             player.render();
         }
         onkeydown = function (event) {
-            _this.infobar.render();
             var key = event.key.toLowerCase();
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
@@ -141,11 +204,11 @@ var Game = /** @class */ (function () {
                     event.preventDefault();
                 }
             }
+            _this.infobar.render();
         };
     };
     Game.prototype.loadLevel = function (level) {
         this.currentLevel = level;
-        document.body.querySelector("game").textContent = "";
         this.start();
     };
     Game.prototype.nextLevel = function () {
@@ -160,21 +223,27 @@ var Game = /** @class */ (function () {
     return Game;
 }());
 onload = function () {
-    if (confirm("Multiplayer?")) {
-        game = new Game(true);
-    }
-    else {
-        game = new Game(false);
-    }
+    game = new Game(true);
     game.start();
 };
 var InfoBar = /** @class */ (function () {
     function InfoBar() {
         this.element = document.createElement("info");
         document.body.querySelector("game").appendChild(this.element);
+        this.title = document.createElement("title");
+        this.element.appendChild(this.title);
+        this.playercards = [];
+        for (var _i = 0, _a = game.players; _i < _a.length; _i++) {
+            var player = _a[_i];
+            this.playercards.push(new Card(this.element, player));
+        }
     }
     InfoBar.prototype.render = function () {
-        this.element.textContent = "Level " + (game.levels.indexOf(game.currentLevel) + 1) + ": " + game.currentLevel.name;
+        this.title.textContent = "Level " + (game.levels.indexOf(game.currentLevel) + 1) + " | " + game.currentLevel.name;
+        for (var _i = 0, _a = this.playercards; _i < _a.length; _i++) {
+            var card = _a[_i];
+            card.render();
+        }
     };
     return InfoBar;
 }());
@@ -207,12 +276,14 @@ var Player = /** @class */ (function () {
         this.collectedItems = [];
     }
     Player.prototype.render = function () {
+        this.reachedEnd = false;
         this.element = document.createElement("player");
         this.element.setAttribute("index", game.players.indexOf(this) + "");
         game.board.element.appendChild(this.element);
         this.move(0, 0);
     };
     Player.prototype.move = function (x, y) {
+        this.reachedEnd = false;
         if (this.positionLocked) {
             return;
         }
@@ -272,6 +343,14 @@ var Tile = /** @class */ (function () {
     Tile.prototype.render = function (element) { };
     Tile.prototype.hit = function (player) {
         return true;
+    };
+    Tile.prototype.occupied = function () {
+        for (var _i = 0, _a = game.players; _i < _a.length; _i++) {
+            var player = _a[_i];
+            if (player.x == this.x && player.y == this.y) {
+                return true;
+            }
+        }
     };
     return Tile;
 }());
@@ -345,8 +424,15 @@ var EndTile = /** @class */ (function (_super) {
         element.setAttribute("end", "");
     };
     EndTile.prototype.hit = function (player) {
+        if (this.occupied()) {
+            return false;
+        }
+        player.reachedEnd = true;
+        player.lockPosition();
         player.waitForAnimationEnd().then(function () {
-            game.nextLevel();
+            if (game.players.filter(function (p) { return p.reachedEnd; }).length == game.players.length) {
+                game.nextLevel();
+            }
         });
         return true;
     };

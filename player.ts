@@ -2,6 +2,7 @@ class Player {
     element: HTMLElement;
     collectedItems: Array<Item>;
     positionLocked: boolean;
+    reachedEnd: boolean;
 
     constructor(
         public x: number,
@@ -15,6 +16,7 @@ class Player {
     }
 
     render() {
+        this.reachedEnd = false;
         this.element = document.createElement("player");
         this.element.setAttribute("index", game.players.indexOf(this) + "");
 
@@ -24,6 +26,8 @@ class Player {
     }
 
     move(x: number, y: number) {
+        this.reachedEnd = false;
+
         if (this.positionLocked) {
             return;
         }

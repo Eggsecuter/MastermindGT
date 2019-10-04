@@ -8,4 +8,12 @@ class Tile {
     hit(player: Player): boolean {
         return true;
     }
+
+    occupied() {
+        for (let player of game.players) {
+            if (player.x == this.x && player.y == this.y) {
+                return true;
+            }
+        }
+    }
 }

@@ -4,8 +4,17 @@ class EndTile extends Tile {
     }
 
     hit(player: Player) {
+        if(this.occupied()){
+            return false;
+        }
+
+        player.reachedEnd = true;
+        player.lockPosition();
+        
         player.waitForAnimationEnd().then(() => {
-            game.nextLevel();
+            if (game.players.filter(p => p.reachedEnd).length == game.players.length) {
+                game.nextLevel();
+            }
         });
 
         return true;

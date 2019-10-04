@@ -4,6 +4,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: calibri;
+    color: rgb(150, 150, 150);
     line-height: 1;
 }
 
@@ -11,27 +12,70 @@ head, script, style, [hidden] {
     display: none;
 }
 
-body{
+body {
     background: rgb(60, 60, 60);
 
-    --tile-size: calc((100vh - 85px) / var(--tiles-y));
+    --tile-size: calc((100vh - 65px - 12px) / var(--tiles-y));
     /* --tile-size: 32px; */
 }
 
-gametitle{
+game-title {
+    text-align: center;
     margin: 10px 20px;
-    font-size: 35px;
-    color: rgb(150, 150, 150);
+    font-size: 45px;
 }
 
-info{
-    margin: 10px 20px;
+startscreen {
+    width: 80%;
+    height: calc((80vh - 65px));
+    background: rgb(150, 150, 150);
+}
+
+info {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid rgb(150, 150, 150);
+    border-radius: 10px;
+}
+
+info title {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+card {
+    width: 100%;
+    border: 1px solid rgb(150, 150, 150);
+    border-radius: 10px;
+    margin: 11px 1px;
+    overflow: hidden;
+}
+
+card[success] {
+    margin: 10px 0;
+    border: 2px solid greenyellow;
+}
+
+card-title {
+    background: rgb(70, 70, 70);
+    padding: 10px;
+    font-size: 24px;
+}
+
+card-content {
+    background: rgb(90, 90, 90);
+    padding: 10px 20px;
     font-size: 20px;
-    color: rgb(150, 150, 150);
 }
 
 board {
     position: relative;
+    overflow: hidden;
+    margin: 5px;
+    border: 1px solid rgb(150, 150, 150);
+    border-radius: 10px;
 }
 
 board row {
@@ -41,16 +85,54 @@ board row {
 board row tile {
     width: var(--tile-size);
     height: var(--tile-size);
-    border: 1px solid black;
     flex-shrink: 0;
 }
 
-key{
+key {
     width: var(--tile-size);
     height: var(--tile-size);
 }
 
-tile[wall]{
+player {
+    position: absolute;
+    left: calc(var(--x) * var(--tile-size));
+    top: calc(var(--y) * var(--tile-size));
+    width: var(--tile-size);
+    height: var(--tile-size);
+    transition: 0.2s;
+}
+
+/* sprites */
+player,
+key,
+tile {
+    background: url('assets/sprite-map.png') no-repeat;
+    background-size: calc(16 * var(--tile-size));
+    image-rendering: pixelated;
+    background-position: calc(var(--tile-size) * -1 * var(--sprite-x)) calc(var(--tile-size) * -1 * var(--sprite-y));
+}
+
+player[index="0"] {
+    --sprite-x: 15;
+    --sprite-y: 15;
+}
+
+player[index="1"] {
+    --sprite-x: 14;
+    --sprite-y: 15;
+}
+
+tile {
+    --sprite-x: 4;
+    --sprite-y: 7;
+}
+
+tile[deadly] {
+    --sprite-x: 4;
+    --sprite-y: 0;
+}
+
+tile[wall] {
     background: black;
 }
 
@@ -71,46 +153,7 @@ tile[door][locked] {
     background: brown;
 }
 
-player{
-    position: absolute;
-    left: calc(var(--x) * var(--tile-size));
-    top: calc(var(--y) * var(--tile-size));
-    width: var(--tile-size);
-    height: var(--tile-size);
-    transition: 0.2s;
-}
-
-player[index="0"] {
-    --sprite-x: 15;
-    --sprite-y: 15;
-}
-
-player[index="1"] {
-    --sprite-x: 14;
-    --sprite-y: 15;
-}
-
-tile{
-    --sprite-x: 4;
-    --sprite-y: 7;
-}
-
-tile[deadly]{
-    --sprite-x: 4;
-    --sprite-y: 0;
-}
-
-key{
+key {
     --sprite-x: 11;
     --sprite-y: 13;
-}
-
-/* sprites */
-player,
-key,
-tile {
-    background: url('assets/sprite-map.png') no-repeat;
-    background-size: calc(16 * var(--tile-size));
-    image-rendering: pixelated;
-    background-position: calc(var(--tile-size) * -1 * var(--sprite-x)) calc(var(--tile-size) * -1 * var(--sprite-y));
 }
