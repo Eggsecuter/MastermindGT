@@ -1,8 +1,6 @@
 let game: Game;
 
 class Game {
-    name: string;
-
     infobar: InfoBar;
     board: Board;
     players: Array<Player>;
