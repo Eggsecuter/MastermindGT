@@ -274,9 +274,9 @@ var Player = /** @class */ (function () {
         this.keyDown = keyDown;
         this.keyRight = keyRight;
         this.collectedItems = [];
+        this.reachedEnd = false;
     }
     Player.prototype.render = function () {
-        this.reachedEnd = false;
         this.element = document.createElement("player");
         this.element.setAttribute("index", game.players.indexOf(this) + "");
         game.board.element.appendChild(this.element);
@@ -428,7 +428,6 @@ var EndTile = /** @class */ (function (_super) {
             return false;
         }
         player.reachedEnd = true;
-        player.lockPosition();
         player.waitForAnimationEnd().then(function () {
             if (game.players.filter(function (p) { return p.reachedEnd; }).length == game.players.length) {
                 game.nextLevel();

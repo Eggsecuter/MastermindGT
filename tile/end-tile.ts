@@ -9,7 +9,6 @@ class EndTile extends Tile {
         }
 
         player.reachedEnd = true;
-        player.lockPosition();
         
         player.waitForAnimationEnd().then(() => {
             if (game.players.filter(p => p.reachedEnd).length == game.players.length) {

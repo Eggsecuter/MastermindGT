@@ -13,10 +13,10 @@ class Player {
         public keyRight: string
     ) {
         this.collectedItems = [];
+        this.reachedEnd = false;
     }
 
     render() {
-        this.reachedEnd = false;
         this.element = document.createElement("player");
         this.element.setAttribute("index", game.players.indexOf(this) + "");
 
@@ -27,7 +27,7 @@ class Player {
 
     move(x: number, y: number) {
         this.reachedEnd = false;
-
+        
         if (this.positionLocked) {
             return;
         }
