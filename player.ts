@@ -26,12 +26,10 @@ class Player {
     }
 
     move(x: number, y: number) {
-        this.reachedEnd = false;
-        
         if (this.positionLocked) {
             return;
         }
-        
+
         for (let tile of game.currentLevel.tiles) {
             if (tile.x == this.x + x && tile.y == this.y + y) {
                 if (!tile.hit(this)) {
@@ -39,14 +37,16 @@ class Player {
                 }
             }
         }
-
+        
         if (this.x + x > -1 && this.x + x < game.currentLevel.size) {
             this.x += x;
         }
-
+        
         if (this.y + y > -1 && this.y + y < game.currentLevel.size) {
             this.y += y;
         }
+
+        this.reachedEnd = !!game.currentLevel.tiles.find(tile => tile.x == this.x && tile.y == this.y && tile instanceof EndTile);
 
         this.element.style.setProperty("--x", this.x.toString());
         this.element.style.setProperty("--y", this.y.toString());

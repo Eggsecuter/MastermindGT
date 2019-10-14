@@ -283,7 +283,7 @@ var Player = /** @class */ (function () {
         this.move(0, 0);
     };
     Player.prototype.move = function (x, y) {
-        this.reachedEnd = false;
+        var _this = this;
         if (this.positionLocked) {
             return;
         }
@@ -301,6 +301,7 @@ var Player = /** @class */ (function () {
         if (this.y + y > -1 && this.y + y < game.currentLevel.size) {
             this.y += y;
         }
+        this.reachedEnd = !!game.currentLevel.tiles.find(function (tile) { return tile.x == _this.x && tile.y == _this.y && tile instanceof EndTile; });
         this.element.style.setProperty("--x", this.x.toString());
         this.element.style.setProperty("--y", this.y.toString());
         for (var _b = 0, _c = game.currentLevel.items; _b < _c.length; _b++) {
