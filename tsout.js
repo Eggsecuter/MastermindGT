@@ -12,26 +12,27 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Board = /** @class */ (function () {
-    function Board() {
+    function Board(scene) {
+        this.scene = scene;
         this.element = document.createElement("board");
         document.body.querySelector("game").appendChild(this.element);
     }
     Board.prototype.render = function () {
         this.element.textContent = "";
-        document.body.style.setProperty("--tiles-y", game.currentLevel.size + "");
-        for (var y = 0; y < game.currentLevel.size; y++) {
+        document.body.style.setProperty("--tiles-y", this.scene.currentLevel.size + "");
+        for (var y = 0; y < this.scene.currentLevel.size; y++) {
             var row = document.createElement("row");
             this.element.appendChild(row);
-            for (var x = 0; x < game.currentLevel.size; x++) {
+            for (var x = 0; x < this.scene.currentLevel.size; x++) {
                 var element = document.createElement("tile");
                 row.appendChild(element);
-                for (var _i = 0, _a = game.currentLevel.tiles; _i < _a.length; _i++) {
+                for (var _i = 0, _a = this.scene.currentLevel.tiles; _i < _a.length; _i++) {
                     var tile = _a[_i];
                     if (tile.x == x && tile.y == y) {
                         tile.render(element);
                     }
                 }
-                for (var _b = 0, _c = game.currentLevel.items; _b < _c.length; _b++) {
+                for (var _b = 0, _c = this.scene.currentLevel.items; _b < _c.length; _b++) {
                     var item = _c[_b];
                     if (item.x == x && item.y == y) {
                         item.render(element);
@@ -66,180 +67,39 @@ var Card = /** @class */ (function () {
     };
     return Card;
 }());
-function load(index) {
-    game.loadLevel(game.levels[index - 1]);
-    return "Current level: " + (game.levels.indexOf(game.currentLevel) + 1);
-}
-function skip(amount) {
-    if (amount === void 0) { amount = 1; }
-    game.loadLevel(game.levels[game.levels.indexOf(game.currentLevel) + amount]);
-    return "Current level: " + (game.levels.indexOf(game.currentLevel) + 1);
-}
-function reload() {
-    game.loadLevel(game.currentLevel);
-    return "Current level: " + (game.levels.indexOf(game.currentLevel) + 1);
-}
-function creditsLevi() {
-    return "Levi went Sicko Mode on this and many other projects!";
-}
 var game;
 var Game = /** @class */ (function () {
-    function Game(multiplayer) {
-        this.multiplayer = multiplayer;
-        if (multiplayer) {
-            this.levels = [
-                new Level("Multikulti Sinepius", 3, [
-                    new StartTile(0, 2),
-                    new StartTile(2, 2),
-                    new EndTile(0, 0),
-                    new EndTile(2, 0),
-                    new WallTile(1, 0),
-                    new WallTile(1, 1),
-                    new WallTile(1, 2)
-                ], []),
-                new Level("Multasdfasdfikupius", 4, [
-                    new StartTile(3, 3),
-                    new StartTile(0, 0),
-                    new EndTile(1, 0),
-                    new EndTile(2, 2)
-                ], []),
-                new Level("ES for advanced people", 4, [
-                    new StartTile(3, 3),
-                    new StartTile(0, 0),
-                    new EndTile(1, 0),
-                    new EndTile(2, 2)
-                ], [])
-            ];
-        }
-        else {
-            this.levels = [
-                new Level("PBC Startup", 3, [
-                    new StartTile(0, 0),
-                    new EndTile(2, 0)
-                ], []),
-                new Level("bands bands bands", 5, [
-                    new StartTile(0, 1),
-                    new EndTile(2, 0),
-                    new DeadlyTile(0, 0),
-                    new DeadlyTile(1, 0),
-                    new DeadlyTile(1, 1),
-                    new DeadlyTile(3, 3)
-                ], []),
-                new Level("Racks in da fridge", 5, [
-                    new StartTile(1, 0),
-                    new EndTile(4, 4),
-                    new DoorTile(2, 1),
-                    new DoorTile(3, 2),
-                    new WallTile(2, 0),
-                    new WallTile(2, 2),
-                    new WallTile(4, 2),
-                    new WallTile(2, 3),
-                    new WallTile(1, 3),
-                    new WallTile(1, 4)
-                ], [
-                    new KeyItem(4, 0),
-                    new KeyItem(0, 4)
-                ]),
-                new Level("Adran Habler", 16, [
-                    new StartTile(0, 0),
-                    new EndTile(1, 1),
-                    new DeadlyTile(1, 0)
-                ], [])
-            ];
-        }
-        this.currentLevel = this.levels[0];
+    function Game() {
+        this.scenes = [
+            new MenuScene("Menu"),
+            new PlayScene("Play", true)
+        ];
+        this.currentScene = this.scenes[1];
+        this.loadScene(this.currentScene);
     }
-    Game.prototype.start = function () {
-        var _this = this;
-        document.body.querySelector("game").textContent = "";
-        this.players = [];
-        var starts = this.currentLevel.tiles.filter(function (item) { return item instanceof StartTile; });
-        if (this.multiplayer) {
-            if (starts.length > 1) {
-                this.players = [
-                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(starts[1].x, starts[1].y, "w", "a", "s", "d")
-                ];
-            }
-            else if (starts.length == 1) {
-                this.players = [
-                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(starts[0].x, starts[0].y, "w", "a", "s", "d")
-                ];
-            }
-        }
-        else {
-            if (starts.length == 1) {
-                this.players = [
-                    new Player(starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright")
-                ];
-            }
-        }
-        this.board = new Board();
-        this.board.render();
-        this.infobar = new InfoBar();
-        this.infobar.render();
-        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
-            var player = _a[_i];
-            player.render();
-        }
-        onkeydown = function (event) {
-            var key = event.key.toLowerCase();
-            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
-                var player = _a[_i];
-                if (player.keyUp == key) {
-                    player.move(0, -1);
-                    event.preventDefault();
-                }
-                else if (player.keyDown == key) {
-                    player.move(0, 1);
-                    event.preventDefault();
-                }
-                else if (player.keyLeft == key) {
-                    player.move(-1, 0);
-                    event.preventDefault();
-                }
-                else if (player.keyRight == key) {
-                    player.move(1, 0);
-                    event.preventDefault();
-                }
-            }
-            _this.infobar.render();
-        };
-    };
-    Game.prototype.loadLevel = function (level) {
-        this.currentLevel = level;
-        this.start();
-    };
-    Game.prototype.nextLevel = function () {
-        var index = this.levels.indexOf(game.currentLevel);
-        if (index + 1 != this.levels.length) {
-            this.loadLevel(this.levels[index + 1]);
-        }
-    };
-    Game.prototype.retryLevel = function () {
-        this.loadLevel(this.currentLevel);
+    Game.prototype.loadScene = function (scene) {
+        scene.load();
     };
     return Game;
 }());
 onload = function () {
-    game = new Game(true);
-    game.start();
+    game = new Game();
 };
 var InfoBar = /** @class */ (function () {
-    function InfoBar() {
+    function InfoBar(scene) {
+        this.scene = scene;
         this.element = document.createElement("info");
         document.body.querySelector("game").appendChild(this.element);
         this.title = document.createElement("title");
         this.element.appendChild(this.title);
         this.playercards = [];
-        for (var _i = 0, _a = game.players; _i < _a.length; _i++) {
+        for (var _i = 0, _a = scene.players; _i < _a.length; _i++) {
             var player = _a[_i];
             this.playercards.push(new Card(this.element, player));
         }
     }
     InfoBar.prototype.render = function () {
-        this.title.textContent = "Level " + (game.levels.indexOf(game.currentLevel) + 1) + " | " + game.currentLevel.name;
+        this.title.textContent = "Level " + (this.scene.levels.indexOf(this.scene.currentLevel) + 1) + " | " + this.scene.currentLevel.name;
         for (var _i = 0, _a = this.playercards; _i < _a.length; _i++) {
             var card = _a[_i];
             card.render();
@@ -266,20 +126,21 @@ var Level = /** @class */ (function () {
     return Level;
 }());
 var Player = /** @class */ (function () {
-    function Player(x, y, keyUp, keyLeft, keyDown, keyRight) {
+    function Player(scene, x, y, keyUp, keyLeft, keyDown, keyRight) {
         this.x = x;
         this.y = y;
         this.keyUp = keyUp;
         this.keyLeft = keyLeft;
         this.keyDown = keyDown;
         this.keyRight = keyRight;
+        this.scene = scene;
         this.collectedItems = [];
         this.reachedEnd = false;
     }
     Player.prototype.render = function () {
         this.element = document.createElement("player");
-        this.element.setAttribute("index", game.players.indexOf(this) + "");
-        game.board.element.appendChild(this.element);
+        this.element.setAttribute("index", this.scene.players.indexOf(this) + "");
+        this.scene.board.element.appendChild(this.element);
         this.move(0, 0);
     };
     Player.prototype.move = function (x, y) {
@@ -287,7 +148,7 @@ var Player = /** @class */ (function () {
         if (this.positionLocked) {
             return;
         }
-        for (var _i = 0, _a = game.currentLevel.tiles; _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.scene.currentLevel.tiles; _i < _a.length; _i++) {
             var tile = _a[_i];
             if (tile.x == this.x + x && tile.y == this.y + y) {
                 if (!tile.hit(this)) {
@@ -295,16 +156,16 @@ var Player = /** @class */ (function () {
                 }
             }
         }
-        if (this.x + x > -1 && this.x + x < game.currentLevel.size) {
+        if (this.x + x > -1 && this.x + x < this.scene.currentLevel.size) {
             this.x += x;
         }
-        if (this.y + y > -1 && this.y + y < game.currentLevel.size) {
+        if (this.y + y > -1 && this.y + y < this.scene.currentLevel.size) {
             this.y += y;
         }
-        this.reachedEnd = !!game.currentLevel.tiles.find(function (tile) { return tile.x == _this.x && tile.y == _this.y && tile instanceof EndTile; });
+        this.reachedEnd = !!this.scene.currentLevel.tiles.find(function (tile) { return tile.x == _this.x && tile.y == _this.y && tile instanceof EndTile; });
         this.element.style.setProperty("--x", this.x.toString());
         this.element.style.setProperty("--y", this.y.toString());
-        for (var _b = 0, _c = game.currentLevel.items; _b < _c.length; _b++) {
+        for (var _b = 0, _c = this.scene.currentLevel.items; _b < _c.length; _b++) {
             var item = _c[_b];
             if (item.x == this.x && item.y == this.y) {
                 item.hit(this);
@@ -336,8 +197,18 @@ Array.prototype.remove = function (item) {
 //     newNode.setAttribute("xxxtentacion", "");
 //     app.bind(this)(newNode);
 // }
+var Scene = /** @class */ (function () {
+    function Scene(name) {
+        this.name = name;
+    }
+    Scene.prototype.load = function () {
+        document.body.querySelector("game").textContent = "";
+    };
+    return Scene;
+}());
 var Tile = /** @class */ (function () {
-    function Tile(x, y) {
+    function Tile(scene, x, y) {
+        this.scene = scene;
         this.x = x;
         this.y = y;
     }
@@ -346,7 +217,7 @@ var Tile = /** @class */ (function () {
         return true;
     };
     Tile.prototype.occupied = function () {
-        for (var _i = 0, _a = game.players; _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.scene.players; _i < _a.length; _i++) {
             var player = _a[_i];
             if (player.x == this.x && player.y == this.y) {
                 return true;
@@ -374,6 +245,159 @@ var KeyItem = /** @class */ (function (_super) {
     };
     return KeyItem;
 }(Item));
+var MenuScene = /** @class */ (function (_super) {
+    __extends(MenuScene, _super);
+    function MenuScene() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MenuScene.prototype.load = function () {
+        document.body.querySelector("game").textContent = "";
+        alert("lol");
+    };
+    return MenuScene;
+}(Scene));
+var PlayScene = /** @class */ (function (_super) {
+    __extends(PlayScene, _super);
+    function PlayScene(name, multiplayer) {
+        var _this = _super.call(this, name) || this;
+        _this.multiplayer = multiplayer;
+        if (multiplayer) {
+            _this.levels = [
+                new Level("Multikulti Sinepius", 3, [
+                    new StartTile(_this, 0, 2),
+                    new StartTile(_this, 2, 2),
+                    new EndTile(_this, 0, 0),
+                    new EndTile(_this, 2, 0),
+                    new WallTile(_this, 1, 0),
+                    new WallTile(_this, 1, 1),
+                    new WallTile(_this, 1, 2)
+                ], []),
+                new Level("Multasdfasdfikupius", 4, [
+                    new StartTile(_this, 3, 3),
+                    new StartTile(_this, 0, 0),
+                    new EndTile(_this, 1, 0),
+                    new EndTile(_this, 2, 2)
+                ], []),
+                new Level("ES for advanced people", 4, [
+                    new StartTile(_this, 3, 3),
+                    new StartTile(_this, 0, 0),
+                    new EndTile(_this, 1, 0),
+                    new EndTile(_this, 2, 2)
+                ], [])
+            ];
+        }
+        else {
+            _this.levels = [
+                new Level("PBC Startup", 3, [
+                    new StartTile(_this, 0, 0),
+                    new EndTile(_this, 2, 0)
+                ], []),
+                new Level("bands bands bands", 5, [
+                    new StartTile(_this, 0, 1),
+                    new EndTile(_this, 2, 0),
+                    new DeadlyTile(_this, 0, 0),
+                    new DeadlyTile(_this, 1, 0),
+                    new DeadlyTile(_this, 1, 1),
+                    new DeadlyTile(_this, 3, 3)
+                ], []),
+                new Level("Racks in da fridge", 5, [
+                    new StartTile(_this, 1, 0),
+                    new EndTile(_this, 4, 4),
+                    new DoorTile(_this, 2, 1),
+                    new DoorTile(_this, 3, 2),
+                    new WallTile(_this, 2, 0),
+                    new WallTile(_this, 2, 2),
+                    new WallTile(_this, 4, 2),
+                    new WallTile(_this, 2, 3),
+                    new WallTile(_this, 1, 3),
+                    new WallTile(_this, 1, 4)
+                ], [
+                    new KeyItem(4, 0),
+                    new KeyItem(0, 4)
+                ]),
+                new Level("Adran Habler", 16, [
+                    new StartTile(_this, 0, 0),
+                    new EndTile(_this, 1, 1),
+                    new DeadlyTile(_this, 1, 0)
+                ], [])
+            ];
+        }
+        _this.currentLevel = _this.levels[0];
+        return _this;
+    }
+    PlayScene.prototype.load = function () {
+        var _this = this;
+        document.body.querySelector("game").textContent = "";
+        this.players = [];
+        var starts = this.currentLevel.tiles.filter(function (item) { return item instanceof StartTile; });
+        if (this.multiplayer) {
+            if (starts.length > 1) {
+                this.players = [
+                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
+                    new Player(this, starts[1].x, starts[1].y, "w", "a", "s", "d")
+                ];
+            }
+            else if (starts.length == 1) {
+                this.players = [
+                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
+                    new Player(this, starts[0].x, starts[0].y, "w", "a", "s", "d")
+                ];
+            }
+        }
+        else {
+            if (starts.length == 1) {
+                this.players = [
+                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright")
+                ];
+            }
+        }
+        this.board = new Board(this);
+        this.board.render();
+        this.infobar = new InfoBar(this);
+        this.infobar.render();
+        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
+            var player = _a[_i];
+            player.render();
+        }
+        onkeydown = function (event) {
+            var key = event.key.toLowerCase();
+            for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
+                var player = _a[_i];
+                if (player.keyUp == key) {
+                    player.move(0, -1);
+                    event.preventDefault();
+                }
+                else if (player.keyDown == key) {
+                    player.move(0, 1);
+                    event.preventDefault();
+                }
+                else if (player.keyLeft == key) {
+                    player.move(-1, 0);
+                    event.preventDefault();
+                }
+                else if (player.keyRight == key) {
+                    player.move(1, 0);
+                    event.preventDefault();
+                }
+            }
+            _this.infobar.render();
+        };
+    };
+    PlayScene.prototype.loadLevel = function (level) {
+        this.currentLevel = level;
+        this.load();
+    };
+    PlayScene.prototype.nextLevel = function () {
+        var index = this.levels.indexOf(this.currentLevel);
+        if (index + 1 != this.levels.length) {
+            this.loadLevel(this.levels[index + 1]);
+        }
+    };
+    PlayScene.prototype.retryLevel = function () {
+        this.loadLevel(this.currentLevel);
+    };
+    return PlayScene;
+}(Scene));
 var DeadlyTile = /** @class */ (function (_super) {
     __extends(DeadlyTile, _super);
     function DeadlyTile() {
@@ -383,9 +407,10 @@ var DeadlyTile = /** @class */ (function (_super) {
         element.setAttribute("deadly", "");
     };
     DeadlyTile.prototype.hit = function (player) {
+        var _this = this;
         player.lockPosition();
         player.waitForAnimationEnd().then(function () {
-            game.retryLevel();
+            _this.scene.retryLevel();
         });
         return true;
     };
@@ -425,13 +450,14 @@ var EndTile = /** @class */ (function (_super) {
         element.setAttribute("end", "");
     };
     EndTile.prototype.hit = function (player) {
+        var _this = this;
         if (this.occupied()) {
             return false;
         }
         player.reachedEnd = true;
         player.waitForAnimationEnd().then(function () {
-            if (game.players.filter(function (p) { return p.reachedEnd; }).length == game.players.length) {
-                game.nextLevel();
+            if (_this.scene.players.filter(function (p) { return p.reachedEnd; }).length == _this.scene.players.length) {
+                _this.scene.nextLevel();
             }
         });
         return true;

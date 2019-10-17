@@ -1,5 +1,6 @@
 class Tile {
     constructor(
+        public scene: PlayScene,
         public x: number,
         public y: number
     ) {}
@@ -10,7 +11,7 @@ class Tile {
     }
 
     occupied() {
-        for (let player of game.players) {
+        for (let player of this.scene.players) {
             if (player.x == this.x && player.y == this.y) {
                 return true;
             }

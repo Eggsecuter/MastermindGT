@@ -7,7 +7,7 @@ class DeadlyTile extends Tile {
         player.lockPosition();
 
         player.waitForAnimationEnd().then(() => {
-            game.retryLevel();
+            this.scene.retryLevel();
         });
 
         return true;

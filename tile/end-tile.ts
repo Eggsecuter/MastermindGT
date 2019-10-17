@@ -11,8 +11,8 @@ class EndTile extends Tile {
         player.reachedEnd = true;
         
         player.waitForAnimationEnd().then(() => {
-            if (game.players.filter(p => p.reachedEnd).length == game.players.length) {
-                game.nextLevel();
+            if (this.scene.players.filter(p => p.reachedEnd).length == this.scene.players.length) {
+                this.scene.nextLevel();
             }
         });
 
