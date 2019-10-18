@@ -159,4 +159,8 @@ class PlayScene extends Scene {
     retryLevel() {
         this.loadLevel(this.currentLevel);
     }
+
+    unload() {
+        onkeydown = () => {};
+    }
 }

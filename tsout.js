@@ -87,6 +87,12 @@ var Game = /** @class */ (function () {
         scene.load();
     };
     Game.prototype.startMenu = function () {
+        for (var _i = 0, _a = this.scenes; _i < _a.length; _i++) {
+            var scene = _a[_i];
+            if (scene instanceof PlayScene) {
+                scene.unload();
+            }
+        }
         this.loadScene(this.scenes.find(function (scene) { return scene.name == "Menu"; }));
     };
     Game.prototype.startSettings = function () {
@@ -440,6 +446,9 @@ var PlayScene = /** @class */ (function (_super) {
     PlayScene.prototype.retryLevel = function () {
         this.loadLevel(this.currentLevel);
     };
+    PlayScene.prototype.unload = function () {
+        onkeydown = function () { };
+    };
     return PlayScene;
 }(Scene));
 var SettingsScene = /** @class */ (function (_super) {
@@ -452,6 +461,19 @@ var SettingsScene = /** @class */ (function (_super) {
         container.textContent = "";
         var startMenu = document.createElement("start-menu");
         container.appendChild(startMenu);
+        var _loop_1 = function (setting) {
+            var input = document.createElement("input");
+            startMenu.appendChild(input);
+            input.type = "text";
+            input.value = setting.name;
+            input.onchange = function () {
+                setting.name = input.value;
+            };
+        };
+        for (var _i = 0, _a = game.playerSettings; _i < _a.length; _i++) {
+            var setting = _a[_i];
+            _loop_1(setting);
+        }
         var buttons = document.createElement("menu-buttons");
         startMenu.appendChild(buttons);
         var back = document.createElement("button");

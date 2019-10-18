@@ -29,6 +29,12 @@ class Game {
     }
 
     startMenu() {
+        for(let scene of this.scenes) {
+            if(scene instanceof PlayScene) {
+                scene.unload();
+            }
+        }
+        
         this.loadScene(this.scenes.find(scene => scene.name == "Menu"));
     }
 

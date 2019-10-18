@@ -6,6 +6,18 @@ class SettingsScene extends Scene {
         const startMenu = document.createElement("start-menu");
         container.appendChild(startMenu);
 
+        for (let setting of game.playerSettings) {
+            const input = document.createElement("input");
+            startMenu.appendChild(input);
+    
+            input.type = "text";
+            input.value = setting.name;
+    
+            input.onchange = () => {
+                setting.name = input.value;
+            }
+        }
+
         const buttons = document.createElement("menu-buttons");
         startMenu.appendChild(buttons);
 
