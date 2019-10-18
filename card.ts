@@ -18,7 +18,7 @@ class Card {
     }
     
     render() {
-        this.title.textContent = "Player: " + this.player.keyUp;
+        this.title.textContent = this.player.settings.name;
         this.element.appendChild(this.title);
 
         this.content.textContent = "Keys: " + this.player.collectedItems.filter(i => i instanceof KeyItem).length;

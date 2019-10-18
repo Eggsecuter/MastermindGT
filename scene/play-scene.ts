@@ -5,12 +5,17 @@ class PlayScene extends Scene {
 
     levels: Array<Level>;
     currentLevel: Level;
+    multiplayer: boolean;
+
+    menuKey: string = "escape";
 
     constructor(
         name: string,
-        public multiplayer: boolean
+        multiplayer: boolean
     ) {
         super(name);
+
+        this.multiplayer = multiplayer
 
         if(multiplayer){
             this.levels = [
@@ -82,24 +87,16 @@ class PlayScene extends Scene {
 
         this.players = [];
         const starts = this.currentLevel.tiles.filter(item => item instanceof StartTile);
-        if(this.multiplayer){
-            if(starts.length > 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(this, starts[1].x, starts[1].y, "w", "a", "s", "d")
-                ];
-            } else if(starts.length == 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(this, starts[0].x, starts[0].y, "w", "a", "s", "d")
-                ];
-            }
-        }
-        else{
-            if(starts.length == 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright")
-                ];
+        
+        if(starts.length && game.playerSettings.length) {
+            this.players.push(new Player(this, game.playerSettings[0], starts[0].x, starts[0].y));
+
+            if(this.multiplayer && game.playerSettings[1]) {
+                if(starts[1]) {
+                    this.players.push(new Player(this, game.playerSettings[1], starts[1].x, starts[1].y));
+                } else {
+                    this.players.push(new Player(this, game.playerSettings[1], starts[0].x, starts[0].y));
+                }
             }
         }
 
@@ -115,20 +112,26 @@ class PlayScene extends Scene {
         onkeydown = event => {
             const key = event.key.toLowerCase();
 
+            if (this.menuKey == key) {
+                game.startMenu();
+
+                event.preventDefault();
+            }
+
             for (let player of this.players) {
-                if (player.keyUp == key) {
+                if (player.settings.keyUp == key) {
                     player.move(0, -1);
 
                     event.preventDefault();
-                } else if (player.keyDown == key) {
+                } else if (player.settings.keyDown == key) {
                     player.move(0, 1);
 
                     event.preventDefault();
-                } else if (player.keyLeft == key) {
+                } else if (player.settings.keyLeft == key) {
                     player.move(-1, 0);
 
                     event.preventDefault();
-                } else if (player.keyRight == key) {
+                } else if (player.settings.keyRight == key) {
                     player.move(1, 0);
 
                     event.preventDefault();

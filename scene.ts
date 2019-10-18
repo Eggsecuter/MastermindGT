@@ -6,6 +6,6 @@ class Scene {
     }
 
     load() {
-        document.body.querySelector("game").textContent = "";
+        document.querySelector("game").textContent = "";
     }
 }

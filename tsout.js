@@ -54,7 +54,7 @@ var Card = /** @class */ (function () {
         this.element.appendChild(this.content);
     }
     Card.prototype.render = function () {
-        this.title.textContent = "Player: " + this.player.keyUp;
+        this.title.textContent = this.player.settings.name;
         this.element.appendChild(this.title);
         this.content.textContent = "Keys: " + this.player.collectedItems.filter(function (i) { return i instanceof KeyItem; }).length;
         this.element.appendChild(this.content);
@@ -70,15 +70,33 @@ var Card = /** @class */ (function () {
 var game;
 var Game = /** @class */ (function () {
     function Game() {
+        this.playerSettings = [
+            new PlayerSetting("Steve", "arrowup", "arrowleft", "arrowdown", "arrowright"),
+            new PlayerSetting("Alex", "w", "a", "s", "d")
+        ];
         this.scenes = [
             new MenuScene("Menu"),
-            new PlayScene("Play", true)
+            new SettingsScene("Settings"),
+            new PlayScene("Singleplayer", false),
+            new PlayScene("Multiplayer", true)
         ];
-        this.currentScene = this.scenes[1];
+        this.currentScene = this.scenes[0];
         this.loadScene(this.currentScene);
     }
     Game.prototype.loadScene = function (scene) {
         scene.load();
+    };
+    Game.prototype.startMenu = function () {
+        this.loadScene(this.scenes.find(function (scene) { return scene.name == "Menu"; }));
+    };
+    Game.prototype.startSettings = function () {
+        this.loadScene(this.scenes.find(function (scene) { return scene.name == "Settings"; }));
+    };
+    Game.prototype.startSingleplayer = function () {
+        this.loadScene(this.scenes.find(function (scene) { return scene.name == "Singleplayer"; }));
+    };
+    Game.prototype.startMultiplayer = function () {
+        this.loadScene(this.scenes.find(function (scene) { return scene.name == "Multiplayer"; }));
     };
     return Game;
 }());
@@ -125,15 +143,22 @@ var Level = /** @class */ (function () {
     }
     return Level;
 }());
-var Player = /** @class */ (function () {
-    function Player(scene, x, y, keyUp, keyLeft, keyDown, keyRight) {
-        this.x = x;
-        this.y = y;
+var PlayerSetting = /** @class */ (function () {
+    function PlayerSetting(name, keyUp, keyLeft, keyDown, keyRight) {
+        this.name = name;
         this.keyUp = keyUp;
         this.keyLeft = keyLeft;
         this.keyDown = keyDown;
         this.keyRight = keyRight;
+    }
+    return PlayerSetting;
+}());
+var Player = /** @class */ (function () {
+    function Player(scene, settings, x, y) {
         this.scene = scene;
+        this.settings = settings;
+        this.x = x;
+        this.y = y;
         this.collectedItems = [];
         this.reachedEnd = false;
     }
@@ -202,7 +227,7 @@ var Scene = /** @class */ (function () {
         this.name = name;
     }
     Scene.prototype.load = function () {
-        document.body.querySelector("game").textContent = "";
+        document.querySelector("game").textContent = "";
     };
     return Scene;
 }());
@@ -251,8 +276,32 @@ var MenuScene = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     MenuScene.prototype.load = function () {
-        document.body.querySelector("game").textContent = "";
-        alert("lol");
+        var container = document.body.querySelector("game");
+        container.textContent = "";
+        var startMenu = document.createElement("start-menu");
+        container.appendChild(startMenu);
+        var logo = document.createElement("logo");
+        startMenu.appendChild(logo);
+        var buttons = document.createElement("menu-buttons");
+        startMenu.appendChild(buttons);
+        var singleplayer = document.createElement("button");
+        buttons.appendChild(singleplayer);
+        singleplayer.textContent = "Singleplayer";
+        singleplayer.onclick = function () {
+            game.startSingleplayer();
+        };
+        var multiplayer = document.createElement("button");
+        buttons.appendChild(multiplayer);
+        multiplayer.textContent = "Multiplayer";
+        multiplayer.onclick = function () {
+            game.startMultiplayer();
+        };
+        var settings = document.createElement("button");
+        buttons.appendChild(settings);
+        settings.textContent = "Settings";
+        settings.onclick = function () {
+            game.startSettings();
+        };
     };
     return MenuScene;
 }(Scene));
@@ -260,6 +309,7 @@ var PlayScene = /** @class */ (function (_super) {
     __extends(PlayScene, _super);
     function PlayScene(name, multiplayer) {
         var _this = _super.call(this, name) || this;
+        _this.menuKey = "escape";
         _this.multiplayer = multiplayer;
         if (multiplayer) {
             _this.levels = [
@@ -330,25 +380,15 @@ var PlayScene = /** @class */ (function (_super) {
         document.body.querySelector("game").textContent = "";
         this.players = [];
         var starts = this.currentLevel.tiles.filter(function (item) { return item instanceof StartTile; });
-        if (this.multiplayer) {
-            if (starts.length > 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(this, starts[1].x, starts[1].y, "w", "a", "s", "d")
-                ];
-            }
-            else if (starts.length == 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright"),
-                    new Player(this, starts[0].x, starts[0].y, "w", "a", "s", "d")
-                ];
-            }
-        }
-        else {
-            if (starts.length == 1) {
-                this.players = [
-                    new Player(this, starts[0].x, starts[0].y, "arrowup", "arrowleft", "arrowdown", "arrowright")
-                ];
+        if (starts.length && game.playerSettings.length) {
+            this.players.push(new Player(this, game.playerSettings[0], starts[0].x, starts[0].y));
+            if (this.multiplayer && game.playerSettings[1]) {
+                if (starts[1]) {
+                    this.players.push(new Player(this, game.playerSettings[1], starts[1].x, starts[1].y));
+                }
+                else {
+                    this.players.push(new Player(this, game.playerSettings[1], starts[0].x, starts[0].y));
+                }
             }
         }
         this.board = new Board(this);
@@ -361,21 +401,25 @@ var PlayScene = /** @class */ (function (_super) {
         }
         onkeydown = function (event) {
             var key = event.key.toLowerCase();
+            if (_this.menuKey == key) {
+                game.startMenu();
+                event.preventDefault();
+            }
             for (var _i = 0, _a = _this.players; _i < _a.length; _i++) {
                 var player = _a[_i];
-                if (player.keyUp == key) {
+                if (player.settings.keyUp == key) {
                     player.move(0, -1);
                     event.preventDefault();
                 }
-                else if (player.keyDown == key) {
+                else if (player.settings.keyDown == key) {
                     player.move(0, 1);
                     event.preventDefault();
                 }
-                else if (player.keyLeft == key) {
+                else if (player.settings.keyLeft == key) {
                     player.move(-1, 0);
                     event.preventDefault();
                 }
-                else if (player.keyRight == key) {
+                else if (player.settings.keyRight == key) {
                     player.move(1, 0);
                     event.preventDefault();
                 }
@@ -397,6 +441,27 @@ var PlayScene = /** @class */ (function (_super) {
         this.loadLevel(this.currentLevel);
     };
     return PlayScene;
+}(Scene));
+var SettingsScene = /** @class */ (function (_super) {
+    __extends(SettingsScene, _super);
+    function SettingsScene() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SettingsScene.prototype.load = function () {
+        var container = document.body.querySelector("game");
+        container.textContent = "";
+        var startMenu = document.createElement("start-menu");
+        container.appendChild(startMenu);
+        var buttons = document.createElement("menu-buttons");
+        startMenu.appendChild(buttons);
+        var back = document.createElement("button");
+        buttons.appendChild(back);
+        back.textContent = "Back";
+        back.onclick = function () {
+            game.startMenu();
+        };
+    };
+    return SettingsScene;
 }(Scene));
 var DeadlyTile = /** @class */ (function (_super) {
     __extends(DeadlyTile, _super);

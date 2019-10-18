@@ -1,20 +1,15 @@
 class Player {
-    scene: PlayScene;
     element: HTMLElement;
     collectedItems: Array<Item>;
     positionLocked: boolean;
     reachedEnd: boolean;
 
     constructor(
-        scene: PlayScene,
+        public scene: PlayScene,
+        public settings: PlayerSetting,
         public x: number,
-        public y: number,
-        public keyUp: string,
-        public keyLeft: string,
-        public keyDown: string,
-        public keyRight: string
+        public y: number
     ) {
-        this.scene = scene;
         this.collectedItems = [];
         this.reachedEnd = false;
     }
