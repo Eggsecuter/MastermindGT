@@ -10,10 +10,10 @@ class PlayScene extends Scene {
     menuKey: string = "escape";
 
     constructor(
-        name: string,
+        route: string,
         multiplayer: boolean
     ) {
-        super(name);
+        super(route);
 
         this.multiplayer = multiplayer
 
@@ -113,7 +113,7 @@ class PlayScene extends Scene {
             const key = event.key.toLowerCase();
 
             if (this.menuKey == key) {
-                game.startMenu();
+                location.replace(location.origin);
 
                 event.preventDefault();
             }

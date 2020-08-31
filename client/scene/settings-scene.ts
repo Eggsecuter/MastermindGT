@@ -27,7 +27,8 @@ class SettingsScene extends Scene {
         back.textContent = "Back"
 
         back.onclick = () => {
-            game.startMenu();
+            // game.startMenu();
+            location.replace(location.origin);
         }
     }
 }

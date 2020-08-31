@@ -12,13 +12,14 @@ class MenuScene extends Scene {
         const buttons = document.createElement("menu-buttons");
         startMenu.appendChild(buttons);
 
-        const singleplayer = document.createElement("button");
-        buttons.appendChild(singleplayer);
+        const tutorial = document.createElement("button");
+        buttons.appendChild(tutorial);
 
-        singleplayer.textContent = "Singleplayer"
+        tutorial.textContent = "Tutorial"
 
-        singleplayer.onclick = () => {
-            game.startSingleplayer();
+        tutorial.onclick = () => {
+            // game.loadScene("tutorial");
+            location.replace(`${location.origin}/tutorial`);
         }
 
         const multiplayer = document.createElement("button");
@@ -27,7 +28,8 @@ class MenuScene extends Scene {
         multiplayer.textContent = "Multiplayer"
 
         multiplayer.onclick = () => {
-            game.startMultiplayer();
+            // game.loadScene("multiplayer");
+            location.replace(`${location.origin}/multiplayer`);
         }
 
         const settings = document.createElement("button");
@@ -36,7 +38,8 @@ class MenuScene extends Scene {
         settings.textContent = "Settings"
 
         settings.onclick = () => {
-            game.startSettings();
+            // game.loadScene("settings");
+            location.replace(`${location.origin}/settings`);
         }
     }
 }

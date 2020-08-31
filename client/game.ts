@@ -2,7 +2,6 @@ let game: Game;
 
 class Game {
     scenes: Array<Scene>;
-    currentScene: Scene;
 
     playerSettings: Array<PlayerSetting>;
 
@@ -13,44 +12,32 @@ class Game {
         ]
 
         this.scenes  = [
-            new MenuScene("Menu"),
-            new SettingsScene("Settings"),
-            new PlayScene("Singleplayer", false),
-            new PlayScene("Multiplayer", true)
+            new MenuScene("menu"),
+            new SettingsScene("settings"),
+            new PlayScene("tutorial", false),
+            new PlayScene("multiplayer", true)
         ];
         
-        this.currentScene = this.scenes[0];
-
-        this.loadScene(this.currentScene);
     }
-
-    loadScene(scene: Scene) {
-        scene.load();
-    }
-
-    startMenu() {
-        for(let scene of this.scenes) {
-            if(scene instanceof PlayScene) {
-                scene.unload();
-            }
-        }
+    
+    init() {
+        const route = location.pathname.split("/")[1] || "menu";
         
-        this.loadScene(this.scenes.find(scene => scene.name == "Menu"));
+        (this.scenes.find(s => s.route == route) || new Scene("")).load();
     }
 
-    startSettings() {
-        this.loadScene(this.scenes.find(scene => scene.name == "Settings"));
-    }
-
-    startSingleplayer() {
-        this.loadScene(this.scenes.find(scene => scene.name == "Singleplayer"));
-    }
-
-    startMultiplayer() {
-        this.loadScene(this.scenes.find(scene => scene.name == "Multiplayer"));
-    }
+    // startMenu() {
+    //     for(let scene of this.scenes) {
+    //         if(scene instanceof PlayScene) {
+    //             scene.unload();
+    //         }
+    //     }
+        
+    //     this.loadScene("menu");
+    // }
 }
 
 onload = () => {
     game = new Game();
+    game.init();
 };

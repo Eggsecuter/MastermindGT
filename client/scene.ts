@@ -1,8 +1,8 @@
 class Scene {
-    name: string
+    route: string
 
-    constructor (name: string) {
-        this.name = name;
+    constructor (route: string) {
+        this.route = route;
     }
 
     load() {
