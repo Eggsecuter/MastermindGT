@@ -2,12 +2,12 @@ const express = require("express");
 const app = express();
 
 // routes
-app.use("/tutorial", express.static("../client"));
-app.use("/multiplayer", express.static("../client"));
-app.use("/multiplayer/:token", express.static("../client"));
-app.use("/settings", express.static("../client"));
+app.use("/tutorial", express.static("../game"));
+app.use("/multiplayer", express.static("../game"));
+app.use("/multiplayer/:token", express.static("../game"));
+app.use("/settings", express.static("../game"));
 
-app.use("/", express.static("../client"));
+app.use("/", express.static("../game"));
 app.use("*", (req, res) => {
     res.redirect("/");
 });
