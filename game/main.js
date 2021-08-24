@@ -427,6 +427,9 @@ var PlayScene = /** @class */ (function (_super) {
         if (index + 1 != this.levels.length) {
             this.loadLevel(this.levels[index + 1]);
         }
+        else {
+            location.replace("/");
+        }
     };
     PlayScene.prototype.retryLevel = function () {
         this.loadLevel(this.currentLevel);

@@ -154,6 +154,9 @@ class PlayScene extends Scene {
         if (index + 1 != this.levels.length) {
             this.loadLevel(this.levels[index + 1]);
         }
+        else {
+            location.replace("/");
+        }
     }
 
     retryLevel() {
