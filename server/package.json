@@ -3,6 +3,6 @@
     "version": "1.0.0",
     "dependencies": {
         "@types/node": "^13.13.5",
-        "express": "^4.17.3"
+        "express": "^4.19.2"
     }
 }
